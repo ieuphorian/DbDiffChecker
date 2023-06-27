@@ -1,0 +1,108 @@
+﻿@model DbDiffChecker.Web.Models.SaveSettingsRequest
+
+@{
+    ViewData["Title"] = "InstallApp";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="InstallApp">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <center><h2>UAT Database Settings</h2></center>
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label for="uatServer">Server</label>
+                    <input type="text" class="form-control" id="uatServer" placeholder="Server" asp-for="UatDbSettings.Server">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="uatDbName">Database Name</label>
+                    <input type="text" class="form-control" id="uatDbName" placeholder="Name" asp-for="UatDbSettings.Name">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="uatUsername">Username</label>
+                    <input type="text" class="form-control" id="uatUsername" placeholder="Username" asp-for="UatDbSettings.Username">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="uatPassword">Password</label>
+                    <input type="password" class="form-control" id="uatPassword" placeholder="Password" asp-for="UatDbSettings.Password">
+                </div>
+            </div>
+            <div class="row" style="margin-top:20px;">
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="uatEnableMars" asp-for="UatDbSettings.MarsEnabled">
+                        <label class="form-check-label" for="uatEnableMars">
+                            Enable Mars
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="uatEnableTrustedConnection" asp-for="UatDbSettings.TrustedConnection">
+                        <label class="form-check-label" for="uatEnableTrustedConnection">
+                            Enable Trusted Connection
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="uatEnableTrustServerCertificate" asp-for="UatDbSettings.TrustServerCertificate">
+                        <label class="form-check-label" for="uatEnableTrustServerCertificate">
+                            Enable Trust Server Certificate
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <center><h2>Production Database Settings</h2></center>
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label for="prodServer">Server</label>
+                    <input type="text" class="form-control" id="prodServer" placeholder="Server" asp-for="ProdDbSettings.Server">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="prodDbName">Database Name</label>
+                    <input type="text" class="form-control" id="prodDbName" placeholder="Name" asp-for="ProdDbSettings.Name">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="prodUsername">Username</label>
+                    <input type="text" class="form-control" id="prodUsername" placeholder="Username" asp-for="ProdDbSettings.Username">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="prodPassword">Password</label>
+                    <input type="password" class="form-control" id="prodPassword" placeholder="Password" asp-for="ProdDbSettings.Password">
+                </div>
+            </div>
+            <div class="row" style="margin-top:20px;">
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="prodEnableMars" asp-for="ProdDbSettings.MarsEnabled">
+                        <label class="form-check-label" for="prodEnableMars">
+                            Enable Mars
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="prodEnableTrustedConnection" asp-for="ProdDbSettings.TrustedConnection">
+                        <label class="form-check-label" for="prodEnableTrustedConnection">
+                            Enable Trusted Connection
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="prodEnableTrustServerCertificate" asp-for="ProdDbSettings.TrustServerCertificate">
+                        <label class="form-check-label" for="prodEnableTrustServerCertificate">
+                            Enable Trust Server Certificate
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit Database Settings" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

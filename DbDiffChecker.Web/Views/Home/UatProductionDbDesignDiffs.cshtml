@@ -1,0 +1,142 @@
+﻿@model IEnumerable<TableDesignData>
+
+@{
+	ViewData["Title"] = "UatProductionDbDesignDiffs";
+}
+
+<center><h2>Desing Differences between UAT-Production Databases</h2></center>
+
+<div class="alert alert-danger" role="alert">
+	If button's background color;
+	<ul>
+		<li>Green: table added to current database but not exists in destination database</li>
+		<li>Yellow: table's design (scheme) changed</li>
+		<li>Red: table does not exists current database but exists in destination database (table deleted).</li>
+	</ul>
+</div>
+@foreach (var table in Model.GroupBy(f => new { f.Table, f.ChangeType }))
+{
+	var color = "info";
+	if (table.Key.ChangeType == ChangeType.Added)
+	{
+		color = "success";
+	}
+	else if (table.Key.ChangeType == ChangeType.Modified)
+	{
+		color = "warning";
+	}
+	else if (table.Key.ChangeType == ChangeType.Deleted)
+	{
+		color = "danger";
+	}
+	<button type="button" class="btn btn-@(color) btnOpenTableDetails" style="margin:10px;" data-id="@table.Key.Table">@table.Key.Table</button>
+}
+@foreach (var table in Model.GroupBy(f => f.Table))
+{
+	<div class="p-0 tableArea table_@table.Key" style="display: none; margin-top:20px;">
+		<div class="alert alert-danger" role="alert">
+			@foreach (var change in table.FirstOrDefault().Changes)
+			{
+				@Html.Raw(change)
+
+				<br />
+			}
+		</div>
+		<a asp-controller="Home" asp-action="UatProductionDbDataDiffs" asp-route-id="@table.Key"
+	   class="btn btn-block btn-secondary"
+	   style="margin-bottom:10px; width:100%;">Check All Data Changes of Selected Table</a>
+		<hr />
+		<table class="table table-responsive table-bordered">
+			<thead>
+				<tr>
+					<th>Column Name</th>
+					<th>Change Type</th>
+					<th>Type</th>
+					<th>Max Length</th>
+					<th>Precision</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var tab in table)
+				{
+					@foreach (var col in tab.Columns)
+					{
+						var colorClass = "bg-white";
+						var text = "Unmodified";
+						if (col.ChangeType == ChangeType.Added)
+						{
+							colorClass = "bg-success";
+							text = "Added.";
+						}
+						else if (col.ChangeType == ChangeType.Modified)
+						{
+							colorClass = "bg-warning";
+							text = "Modified";
+						}
+						else if (col.ChangeType == ChangeType.Deleted)
+						{
+							colorClass = "bg-deleted";
+							text = "Deleted";
+						}
+						<tr class="@colorClass">
+							<td>@col.ColumnName</td>
+							<td>
+								@text
+							</td>
+							<td>
+								@if (col.Type != col.NewType)
+								{
+									<text>@col.Type => @col.NewType</text>
+								}
+								else
+								{
+									<text>@col.Type</text>
+								}
+							</td>
+							<td>
+								@if (col.MaxLength != col.MaxLength)
+								{
+									<text>@col.MaxLengthView => @col.MaxLengthView</text>
+								}
+								else
+								{
+									<text>@col.MaxLengthView</text>
+								}
+							</td>
+							<td>
+								@if (col.Precision != col.NewPrecision)
+								{
+									<text>@col.Precision => @col.NewPrecision</text>
+								}
+								else
+								{
+									<text>@col.Precision</text>
+								}
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+@section Scripts{
+	<script>
+		$(".btnOpenTableDetails").click(function () {
+			var id = $(this).attr("data-id");
+			$(".tableArea").hide();
+			var childs = $(".table_" + id);
+			for (var i = 0; i < childs.length; i++) {
+				var child = childs[i];
+				if (checkUIElementVisible($(child)))
+					$(child).hide();
+				else
+					$(child).show();
+			}
+		});
+		function checkUIElementVisible(element) {
+			return ((element.css('display') !== 'none') && (element.css('visibility') !== 'hidden'));
+		}
+
+	</script>
+}

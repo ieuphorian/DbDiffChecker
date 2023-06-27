@@ -1,0 +1,175 @@
+﻿@model IEnumerable<DataDiffModel>
+
+@{
+	ViewData["Title"] = "UatProductionDbDataDiffs";
+	var primaryKey = ViewBag.PrimaryKey;
+	var primaryKeyIndex = 0;
+	var columns = Model.GroupBy(f => f.ColumnName);
+	var columnArray = new string[columns.Count()];
+}
+
+<h1>@ViewBag.TableName table UAT-Production data differences</h1>
+
+<p>
+	<a href="#" class="btnSelectAll btn btn-info">Select all changes</a>
+	<a href="#" class="btnComplete btn btn-success">Update production by all selected changes</a>
+	<a href="#" class="btnSqlDownload btn btn-warning">Download Sql File by all selected changes</a>
+</p>
+<table class="table table">
+	<thead>
+		<tr>
+			<th width="10%">
+				Select Changes
+			</th>
+			@{
+				int columnIndex = 0;
+			}
+			@foreach (var column in columns)
+			{
+				<th>
+					@column.Key
+				</th>
+				if (primaryKey == column.Key)
+				{
+					primaryKeyIndex = columnIndex;
+				}
+				columnArray[columnIndex] = column.Key;
+				columnIndex++;
+			}
+		</tr>
+	</thead>
+	<tbody>
+		@{
+			var dataCount = columns.FirstOrDefault()?.Count();
+		}
+		@for (int i = 0; i < dataCount; i++)
+		{
+			var columnData = columns.FirstOrDefault(f => f.Key == columnArray[primaryKeyIndex]).ToArray()[i];
+			var id = columnData.ObjectId;
+			<tr>
+				@if (columnData.ChangeType == ChangeType.Added)
+				{
+					<td><input type="checkbox" id="cbNewRow_@id" class="cbAction cbNewRow" data-id="@id" data-type="row" style="width:50px;height: 50px;" /></td>
+				}
+				else
+				{
+					<td><input type="checkbox" disabled style="width:50px;height: 50px;" /></td>
+				}
+				@for (int k = 0; k < columns.Count(); k++)
+				{
+					var value = columns.FirstOrDefault(f => f.Key == columnArray[k]).ToList().FirstOrDefault(f => f.ObjectId == id);
+					var color = "bg-white";
+					var checkBox = "";
+					if (value != null)
+					{
+						var text = value.Value.ToString();
+						if (value.ChangeType == ChangeType.Added)
+						{
+							color = "bg-success";
+						}
+						else if (value.ChangeType == ChangeType.Modified)
+						{
+							checkBox = "<input type=\"checkbox\" id=\"cbEditColumn_" + columnArray[k] + "_" + id + "\" class=\"cbAction cbEditColumn\" data-id=\"" + id + "\" data-name=\"" + columnArray[k] + "\" data-type=\"column\" style=\"width:20px;height: 20px;\" />";
+							color = "bg-warning";
+							text = value.Value.ToString() + " => " + value.NewValue.ToString();
+						}
+						else if (value.ChangeType == ChangeType.Deleted)
+						{
+							color = "bg-danger";
+						}
+						<td class="@color">
+							@Html.Raw(checkBox)
+							@if (!string.IsNullOrEmpty(text))
+							{
+								@text.Substring(0, Math.Min(text.Length, 150))
+							}
+						</td>
+					}
+					else
+					{
+						<td class="@color">
+						</td>
+					}
+				}
+			</tr>
+		}
+	</tbody>
+</table>
+@section Scripts{
+	<script>
+		class DataChanges {
+			objectId = "";
+			type = "";
+			columnName = "";
+			constructor(objectId, type, columnName) {
+				this.objectId = objectId;
+				this.type = type;
+				this.columnName = columnName;
+			}
+		}
+		$(".btnSelectAll").click(function () {
+			var checkBoxes = $(".cbAction");
+			for (var i = 0; i < checkBoxes.length; i++) {
+				var checkBox = $(checkBoxes[i]);
+				var isChecked = checkBox.attr("checked");
+				checkBox.attr("checked", !isChecked);
+			}
+		});
+		$(".btnComplete").click(function () {
+			var data = prepareData();
+			if (confirm("Are you sure about updating production table?")) {
+				$.ajax({
+					url: '/Home/UpdateChanges',
+					data: { table: "@ViewBag.TableName", model: data },
+					type: 'post',
+					success: function (result) {
+						console.log(result);
+					}
+				})
+			}
+		});
+		$(".btnSqlDownload").click(function () {
+			var data = prepareData();
+			if (confirm("Are you sure about downloading changes?")) {
+				$.ajax({
+					url: '/Home/DownloadSqlFile',
+					data: { table: "@ViewBag.TableName", model: data },
+					type: 'post',
+					success: function (result) {
+						var a = document.createElement('a');
+						a.href = URL.createObjectURL(new Blob([result], { type: "application/octet-stream" }));
+						a.download = "@(ViewBag.TableName)_Update.sql";
+						a.dispatchEvent(new MouseEvent('click'));
+						console.log(a);
+					}
+				})
+			}
+		});
+		function prepareData() {
+			var data = [];
+			var checkBoxes = $(".cbAction");
+			for (var i = 0; i < checkBoxes.length; i++) {
+				var checkBox = $(checkBoxes[i]);
+				var isChecked = checkBox.is(':checked');
+				if (isChecked) {
+					var entity = new DataChanges();
+					entity.objectId = checkBox.attr("data-id");
+					entity.type = checkBox.attr("data-type");
+					entity.columnName = checkBox.attr("data-name");
+					data.push(entity);
+				}
+			}
+			var alertMessage = "";
+			var columnChangeCount = 0;
+			var newRowCount = 0;
+			data.map((change) => {
+				if (change.type == "row")
+					newRowCount++;
+				else if (change.type == "column")
+					columnChangeCount++;
+			});
+			alert("Insert total row count: " + newRowCount + "\n Total update data count: " + columnChangeCount);
+			return data;
+		}
+	</script>
+}

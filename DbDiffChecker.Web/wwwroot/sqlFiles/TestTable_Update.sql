@@ -1,0 +1,2 @@
+insert into TestTable (Id,Name,TestBool,TestDate,TestId,TestNullable,TestPrice) values ('1',N'werwqe',1,'2023-06-27 00:00:00','0e8e3a3b-d068-486a-93bf-28bb3ed348aa',NULL,'12,22');
+insert into TestTable (Id,Name,TestBool,TestDate,TestId,TestNullable,TestPrice) values ('2',N'asfsadf',1,'2023-06-27 00:00:00','0e8e3a3b-d068-486a-93bf-28bb3ed348ab',N'1231asfa','253,53');
