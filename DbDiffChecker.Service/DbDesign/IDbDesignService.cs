@@ -18,7 +18,7 @@ namespace DbDiffChecker.Service.DbDesign
 		ReturnData<List<DataDiffModel>> UatProductionDbDataDiffs(string table);
 
 		/// <summary>
-		/// Update changes to prod based user's selected changes (changes only based on data scheme will not change)
+		/// Update changes to prod based user's selected changes (changes only based on data, scheme will not change)
 		/// </summary>
 		/// <param name="table">Table Name</param>
 		/// <param name="model">User's selected changes</param>
@@ -26,7 +26,7 @@ namespace DbDiffChecker.Service.DbDesign
 		ReturnData<string> UpdateChanges(string table, List<ChangeModel> model);
 
         /// <summary>
-        /// Create sql file for changes uat-prod based user's selected changes (changes only based on data scheme will not change)
+        /// Create sql file for changes uat-prod based user's selected changes (changes only based on data, scheme will not change)
         /// </summary>
         /// <param name="table">Table Name</param>
         /// <param name="model">User's selected changes</param>
